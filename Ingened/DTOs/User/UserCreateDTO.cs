@@ -1,0 +1,18 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace Api.DTOs.User;
+
+public class UserCreateDTO
+{
+    [Required]
+    [MaxLength(100)]
+    public string Nombre { get; set; } = string.Empty;
+
+    [Required]
+    [EmailAddress]
+    [MaxLength(150)]
+    public string Email { get; set; } = string.Empty;
+
+    [Required]
+    public string Password { get; set; } = string.Empty;
+}
