@@ -32,13 +32,33 @@ public class GlobalExceptionMiddleware
     private Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+        var statusCode = (int)HttpStatusCode.InternalServerError;
+        var message = _env.IsDevelopment() ? exception.Message : "Ha ocurrido un error interno en el servidor. Inténtelo más tarde.";
+
+        switch (exception)
+        {
+            case Ingened.Exceptions.NotFoundException e:
+                statusCode = (int)HttpStatusCode.NotFound;
+                message = e.Message;
+                break;
+            case Ingened.Exceptions.BadRequestException e:
+                statusCode = (int)HttpStatusCode.BadRequest;
+                message = e.Message;
+                break;
+            case Ingened.Exceptions.UnauthorizedException e:
+                statusCode = (int)HttpStatusCode.Unauthorized;
+                message = e.Message;
+                break;
+        }
+
+        context.Response.StatusCode = statusCode;
 
         var response = new
         {
-            StatusCode = context.Response.StatusCode,
-            Message = _env.IsDevelopment() ? exception.Message : "Ha ocurrido un error interno en el servidor. Inténtelo más tarde.",
-            Detail = _env.IsDevelopment() ? exception.StackTrace : null
+            StatusCode = statusCode,
+            Message = message,
+            Detail = _env.IsDevelopment() && statusCode == (int)HttpStatusCode.InternalServerError ? exception.StackTrace : null
         };
 
         var json = JsonSerializer.Serialize(response, new JsonSerializerOptions 
