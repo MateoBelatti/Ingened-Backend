@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Api.DTOs.Auth;
+namespace Core.DTOs;
 
 public class GoogleLoginDTO
 {

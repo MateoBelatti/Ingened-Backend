@@ -1,5 +1,5 @@
-using Api.DTOs.Auth;
 using Core.Interfaces;
+using Core.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ingened.Controllers;

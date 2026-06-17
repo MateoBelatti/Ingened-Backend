@@ -1,6 +1,6 @@
-using Api.DTOs.User;
 using Core.Entities;
 using Core.Interfaces;
+using Core.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
