@@ -1,4 +1,3 @@
-using Core.Entities;
 using Core.Interfaces;
 using Core.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -22,18 +21,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var users = await _userService.GetAllAsync();
-        
-        // Retornamos un objeto anónimo omitiendo la contraseña cifrada
-        var usersResponse = users.Select(u => new 
-        { 
-            u.Id, 
-            u.Nombre, 
-            u.Email, 
-            u.UltimaConeccion, 
-            u.GoogleId 
-        });
-
-        return Ok(usersResponse);
+        return Ok(users);
     }
 
     [HttpGet("{id}")]
@@ -44,7 +32,7 @@ public class UserController : ControllerBase
         if (user == null)
             return NotFound();
 
-        return Ok(new { user.Id, user.Nombre, user.Email, user.UltimaConeccion, user.GoogleId });
+        return Ok(user);
     }
 
     [HttpPost]
@@ -54,25 +42,9 @@ public class UserController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var existingUser = await _userService.GetByEmailAsync(createDto.Email);
-        if (existingUser != null)
-            return BadRequest(new { message = "El email ya está en uso" });
+        var createdUser = await _userService.AddAsync(createDto);
 
-        var user = new User
-        {
-            Nombre = createDto.Nombre,
-            Email = createDto.Email,
-            Password = createDto.Password
-        };
-
-        var createdUser = await _userService.AddAsync(user);
-
-        return CreatedAtAction(nameof(GetById), new { id = createdUser.Id }, new 
-        { 
-            createdUser.Id, 
-            createdUser.Nombre, 
-            createdUser.Email 
-        });
+        return CreatedAtAction(nameof(GetById), new { id = createdUser.Id }, createdUser);
     }
 
     [HttpPut("{id}")]
@@ -81,17 +53,7 @@ public class UserController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var user = await _userService.GetByIdAsync(id);
-        if (user == null)
-            return NotFound();
-
-        if (!string.IsNullOrEmpty(updateDto.Nombre))
-            user.Nombre = updateDto.Nombre;
-            
-        if (!string.IsNullOrEmpty(updateDto.Email))
-            user.Email = updateDto.Email;
-
-        await _userService.UpdateAsync(user);
+        await _userService.UpdateAsync(id, updateDto);
 
         return NoContent();
     }
@@ -99,10 +61,6 @@ public class UserController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var user = await _userService.GetByIdAsync(id);
-        if (user == null)
-            return NotFound();
-
         await _userService.DeleteAsync(id);
         return NoContent();
     }

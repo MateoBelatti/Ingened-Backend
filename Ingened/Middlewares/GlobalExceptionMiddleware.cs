@@ -38,15 +38,15 @@ public class GlobalExceptionMiddleware
 
         switch (exception)
         {
-            case Ingened.Exceptions.NotFoundException e:
+            case Core.Exceptions.NotFoundException e:
                 statusCode = (int)HttpStatusCode.NotFound;
                 message = e.Message;
                 break;
-            case Ingened.Exceptions.BadRequestException e:
+            case Core.Exceptions.BadRequestException e:
                 statusCode = (int)HttpStatusCode.BadRequest;
                 message = e.Message;
                 break;
-            case Ingened.Exceptions.UnauthorizedException e:
+            case Core.Exceptions.UnauthorizedException e:
                 statusCode = (int)HttpStatusCode.Unauthorized;
                 message = e.Message;
                 break;
