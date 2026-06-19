@@ -1,8 +1,8 @@
-using Core.Entities;
+using Core.DTOs;
 
 namespace Core.Interfaces;
 
 public interface IGenerateJWT
 {
-    string GenerateToken(User user);
+    string GenerateToken(UserResponseDTO user);
 }
