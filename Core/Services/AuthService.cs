@@ -1,4 +1,4 @@
-using Core.Entities;
+using Core.DTOs;
 using Core.Interfaces;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Configuration;
@@ -20,10 +20,9 @@ public class AuthService : IAuthService
 
     public async Task<string?> LoginAsync(string email, string password)
     {
-        var user = await _userService.GetByEmailAsync(email);
+        var user = await _userService.ValidateCredentialsAsync(email, password);
         
-        // Verificación del hash de BCrypt
-        if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
+        if (user == null)
         {
             return null;
         }
@@ -46,26 +45,25 @@ public class AuthService : IAuthService
             
             if (user == null)
             {
-                // Si no existe por GoogleId, buscar por Email
                 user = await _userService.GetByEmailAsync(payload.Email);
                 
                 if (user != null)
                 {
-                    // Si existe por email, asociar el GoogleId
+                    await _userService.UpdateGoogleIdAsync(user.Id, payload.Subject);
                     user.GoogleId = payload.Subject;
-                    await _userService.UpdateAsync(user);
                 }
                 else
                 {
-                    // Crear nuevo usuario si no existe de ninguna forma
-                    user = new User
+                    var createDto = new UserCreateDTO
                     {
                         Nombre = payload.Name,
                         Email = payload.Email,
-                        GoogleId = payload.Subject,
-                        Password = "" // UserService le aplicará un Guid y un Hash
+                        Password = "" 
                     };
-                    await _userService.AddAsync(user);
+                    user = await _userService.AddAsync(createDto);
+                    
+                    await _userService.UpdateGoogleIdAsync(user.Id, payload.Subject);
+                    user.GoogleId = payload.Subject;
                 }
             }
             

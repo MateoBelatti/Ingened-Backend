@@ -1,5 +1,6 @@
 using Core.Entities;
 using Core.Interfaces;
+using Core.DTOs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,7 +18,7 @@ public class GenerateJWT : IGenerateJWT
         _configuration = configuration;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(UserResponseDTO user)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
         var secretKey = jwtSettings["SecretKey"];
