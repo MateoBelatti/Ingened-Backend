@@ -9,6 +9,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configuración de Licencia de QuestPDF
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -25,6 +28,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGenerateJWT, GenerateJWT>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IInformeService, InformeService>();
+builder.Services.AddScoped<IInformeRepository, InformeRepository>();
+builder.Services.AddScoped<IDriveService, DriveService>();
 
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<Core.Mapper.UserMapper>());
 
