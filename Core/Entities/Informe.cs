@@ -18,6 +18,12 @@ public class Informe
     [Required]
     public string Url { get; set; } = string.Empty;
 
+    [MaxLength(100)]
+    public string Cliente { get; set; } = string.Empty;
+
+    [MaxLength(100)]
+    public string GoogleDriveFileId { get; set; } = string.Empty;
+
     [Required]
     public int UserId { get; set; }
 
