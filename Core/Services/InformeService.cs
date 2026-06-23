@@ -44,4 +44,14 @@ public class InformeService : IInformeService
             userId
         );
     }
+
+    public async Task<IEnumerable<Informe>> GetAllInformesAsync()
+    {
+        return await _informeRepository.GetAllInformesAsync();
+    }
+
+    public async Task<Informe?> GetInformeByIdAsync(int id)
+    {
+        return await _informeRepository.GetInformeByIdAsync(id);
+    }
 }

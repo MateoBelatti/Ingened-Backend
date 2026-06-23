@@ -1,6 +1,7 @@
 using Core.Data;
 using Core.Entities;
 using Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Repositories;
 
@@ -28,5 +29,15 @@ public class InformeRepository : IInformeRepository
         _context.Informes.Add(informe);
         await _context.SaveChangesAsync();
         return informe;
+    }
+
+    public async Task<IEnumerable<Informe>> GetAllInformesAsync()
+    {
+        return await _context.Informes.ToListAsync();
+    }
+
+    public async Task<Informe?> GetInformeByIdAsync(int id)
+    {
+        return await _context.Informes.FindAsync(id);
     }
 }
