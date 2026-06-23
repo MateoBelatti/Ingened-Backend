@@ -69,6 +69,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Aplicar migraciones automáticamente al iniciar
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    if (db.Database.GetPendingMigrations().Any())
+    {
+        db.Database.Migrate();
+    }
+}
+
 // Configure the HTTP request pipeline.
 app.UseMiddleware<Ingened.Middlewares.GlobalExceptionMiddleware>();
 
