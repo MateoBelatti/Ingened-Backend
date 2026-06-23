@@ -28,7 +28,7 @@ public class InformeController : ControllerBase
         }
         try
         {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
             if (!int.TryParse(userIdStr, out int userId))
             {
                 return Unauthorized(new { message = "Usuario no autorizado o token inválido." });
@@ -39,17 +39,29 @@ public class InformeController : ControllerBase
             return Ok(new 
             { 
                 message = "Informe generado y guardado exitosamente.", 
-                informeId = nuevoInforme.Id,
-                url = nuevoInforme.Url 
+                informe = nuevoInforme
             });
         }
         catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message });
         }
-        catch (Exception ex)
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetAllInformes()
+    {
+        var informes = await _informeService.GetAllInformesAsync();
+        return Ok(informes);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetInformeById(int id)
+    {
+        var informe = await _informeService.GetInformeByIdAsync(id);
+        if (informe == null)
         {
-            return StatusCode(500, new { message = "Error interno del servidor.", error = ex.Message });
+            return NotFound(new { message = $"Informe con ID {id} no encontrado." });
         }
+        return Ok(informe);
     }
 }

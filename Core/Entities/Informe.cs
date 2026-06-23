@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Core.Entities;
 
@@ -29,5 +30,6 @@ public class Informe
 
     // Relación con el usuario que creó/es dueño del informe
     [ForeignKey(nameof(UserId))]
+    [JsonIgnore]
     public User User { get; set; } = null!;
 }
