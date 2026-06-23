@@ -61,9 +61,17 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173", "http://localhost:5174")
+            var frontendUrl = builder.Configuration["FrontendUrl"];
+            var origins = new List<string> { "http://localhost:5173", "http://localhost:5174", "https://ingenedpdf.vercel.app" };
+            if (!string.IsNullOrEmpty(frontendUrl))
+            {
+                origins.Add(frontendUrl);
+            }
+
+            policy.WithOrigins(origins.ToArray())
                   .AllowAnyHeader()
-                  .AllowAnyMethod();
+                  .AllowAnyMethod()
+                  .AllowCredentials();
         });
 });
 
