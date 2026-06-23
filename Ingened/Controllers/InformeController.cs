@@ -47,21 +47,22 @@ public class InformeController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
-    [HttpGet]
-    public async Task<IActionResult> GetAllInformes()
-    {
-        var informes = await _informeService.GetAllInformesAsync();
-        return Ok(informes);
-    }
+    //[HttpGet]
+    
+    //public async Task<IActionResult> GetAllInformes()
+    //{
+    //    var informes = await _informeService.GetAllInformesAsync();
+    //    return Ok(informes);
+    //}
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetInformeById(int id)
-    {
-        var informe = await _informeService.GetInformeByIdAsync(id);
-        if (informe == null)
-        {
-            return NotFound(new { message = $"Informe con ID {id} no encontrado." });
-        }
-        return Ok(informe);
-    }
+    //[HttpGet("{id}")]
+    //public async Task<IActionResult> GetInformeById(int id)
+    //{
+    //    var informe = await _informeService.GetInformeByIdAsync(id);
+    //    if (informe == null)
+    //    {
+    //        return NotFound(new { message = $"Informe con ID {id} no encontrado." });
+    //    }
+    //    return Ok(informe);
+    //}
 }
