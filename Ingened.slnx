@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Core/Core.csproj" />
+  <Project Path="Ingened/Api.csproj" />
+</Solution>

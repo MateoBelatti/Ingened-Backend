@@ -361,3 +361,11 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+#Credenciales de google
+google-credentials.json
+client_secrets.json
+client_secret.json
+token.json/
+appsettings.json
+appsettings.*.json
