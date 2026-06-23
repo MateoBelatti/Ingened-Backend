@@ -18,7 +18,16 @@ public class DriveService : IDriveService
 
     public async Task<DriveUploadResult> UploadPdfAsync(byte[] fileBytes, DatosArchivosDto datosArchivos)
     {
-        var credentialsFile = _configuration["GoogleDrive:CredentialsFileName"] ?? "google-credentials.json";
+        var credentialsFileName = _configuration["GoogleDrive:CredentialsFileName"] ?? "client_secret.json";
+        var credentialsFile = Path.Combine(AppContext.BaseDirectory, credentialsFileName);
+        
+        // Soporte para Railway: Leer el contenido del JSON desde variable de entorno y guardarlo como archivo
+        var clientSecretJson = Environment.GetEnvironmentVariable("GoogleDrive__ClientSecretJson");
+        if (!string.IsNullOrEmpty(clientSecretJson))
+        {
+            File.WriteAllText(credentialsFile, clientSecretJson);
+        }
+
         var folderId = _configuration["GoogleDrive:FolderId"];
 
         if (string.IsNullOrEmpty(folderId))
@@ -28,10 +37,18 @@ public class DriveService : IDriveService
 
         // 1. Autenticación (OAuth 2.0 de Usuario)
         UserCredential credential;
+        string credPath = Path.Combine(AppContext.BaseDirectory, "token.json");
+        
+        // Soporte para Railway: Leer el token de respuesta desde variable de entorno y guardarlo
+        var tokenJson = Environment.GetEnvironmentVariable("GoogleDrive__TokenJson");
+        if (!string.IsNullOrEmpty(tokenJson))
+        {
+            Directory.CreateDirectory(credPath);
+            File.WriteAllText(Path.Combine(credPath, "Google.Apis.Auth.OAuth2.Responses.TokenResponse-user"), tokenJson);
+        }
         using (var stream = new FileStream(credentialsFile, FileMode.Open, FileAccess.Read))
         {
             // Autoriza y guarda el token de refresco localmente
-            string credPath = "token.json";
             credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                 GoogleClientSecrets.FromStream(stream).Secrets,
                 new[] { Google.Apis.Drive.v3.DriveService.ScopeConstants.DriveFile },
