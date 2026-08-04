@@ -2,15 +2,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Copy csproj files and restore dependencies
+# Copiar archivos csproj y restaurar dependencias
 COPY ["Core/Core.csproj", "Core/"]
 COPY ["Ingened/Api.csproj", "Ingened/"]
 RUN dotnet restore "Ingened/Api.csproj"
 
-# Copy the rest of the source code
+# Copiar el resto del código fuente
 COPY . .
 
-# Publish the application
+# Publicar la aplicación
 RUN dotnet publish "Ingened/Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Runtime Stage
@@ -18,7 +18,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Expose port (Railway binds to PORT, ASP.NET 10.0 listens on 8080 by default)
+# Exponer el puerto que usará Railway (suele inyectar la variable PORT)
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
