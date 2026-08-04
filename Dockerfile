@@ -1,24 +1,22 @@
+# Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Copy csproj and restore as distinct layers
-COPY ["Ingened/Api.csproj", "Ingened/"]
+# Copiar archivos csproj y restaurar dependencias
 COPY ["Core/Core.csproj", "Core/"]
+COPY ["Ingened/Api.csproj", "Ingened/"]
 RUN dotnet restore "Ingened/Api.csproj"
 
-# Copy everything else and build
+# Copiar el resto del código fuente
 COPY . .
-WORKDIR "/src/Ingened"
-RUN dotnet build "Api.csproj" -c Release -o /app/build
 
-# Publish the application
-FROM build AS publish
-RUN dotnet publish "Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+# Publicar la aplicación
+RUN dotnet publish "Ingened/Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# Final stage/image
+# Runtime Stage
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/publish .
 
 # Exponer el puerto que usará Railway (suele inyectar la variable PORT)
 ENV ASPNETCORE_URLS=http://+:8080
