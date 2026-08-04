@@ -77,14 +77,22 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Aplicar migraciones automáticamente al iniciar
-using (var scope = app.Services.CreateScope())
+// Aplicar migraciones automáticamente al iniciar (Modificado: controlado por configuración local en appsettings.json)
+if (app.Configuration.GetValue<bool>("ApplyMigrationsOnStartup", false))
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    if (db.Database.GetPendingMigrations().Any())
+    using (var scope = app.Services.CreateScope())
     {
-        db.Database.Migrate();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        if (db.Database.GetPendingMigrations().Any())
+        {
+            db.Database.Migrate();
+        }
     }
+}
+else
+{
+    // Las migraciones automáticas están desactivadas localmente. 
+    // Para aplicarlas automáticamente al iniciar, cambie "ApplyMigrationsOnStartup" a true en appsettings.json.
 }
 
 // Configure the HTTP request pipeline.
