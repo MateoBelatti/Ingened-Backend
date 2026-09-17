@@ -2,6 +2,7 @@ using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
 using Core.utils.InformeLp;
+using Microsoft.Extensions.Logging;
 using QuestPDF.Fluent;
 
 namespace Core.Services;
@@ -10,9 +11,11 @@ public class InformeService : IInformeService
 {
     private readonly IDriveService _driveService;
     private readonly IInformeRepository _informeRepository;
+    private readonly ILogger<InformeService> _logger;
 
-    public InformeService(IDriveService driveService, IInformeRepository informeRepository)
+    public InformeService(IDriveService driveService, IInformeRepository informeRepository, ILogger<InformeService> logger)
     {
+        _logger = logger;
         _driveService = driveService;
         _informeRepository = informeRepository;
     }
@@ -34,6 +37,7 @@ public class InformeService : IInformeService
 
         // Sube el informe a drive
         var uploadResult = await _driveService.UploadPdfAsync(pdfBytes, informeDto.DatosArchivos);
+        _logger.LogInformation("PDF subido a Drive con FileId {FileId} para informe {Numero}", uploadResult.FileId, informeDto.DatosArchivos.NrInf);
 
         // 3. Guardar en Base de Datos a través del repositorio
         return await _informeRepository.CreateInformeAsync(
