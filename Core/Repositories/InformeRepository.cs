@@ -14,7 +14,7 @@ public class InformeRepository : IInformeRepository
         _context = context;
     }
 
-    public async Task<Informe> CreateInformeAsync(string nrInf, string cliente, string url, string googleDriveFileId, int userId)
+    public async Task<Informe> CreateInformeAsync(string nrInf, string cliente, string url, string googleDriveFileId, int userId, string tipo)
     {
         var informe = new Informe
         {
@@ -23,7 +23,8 @@ public class InformeRepository : IInformeRepository
             Fecha = DateTime.UtcNow,
             Url = url,
             GoogleDriveFileId = googleDriveFileId,
-            UserId = userId
+            UserId = userId,
+            Tipo = tipo ?? "LP"
         };
 
         _context.Informes.Add(informe);
