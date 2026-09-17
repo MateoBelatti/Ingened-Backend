@@ -10,11 +10,13 @@ public class AuthService : IAuthService
     private readonly IUserService _userService;
     private readonly IGenerateJWT _generateJWT;
     private readonly string _googleClientId;
+    private readonly IConfiguration _configuration;
 
     public AuthService(IUserService userService, IGenerateJWT generateJWT, IConfiguration configuration)
     {
         _userService = userService;
         _generateJWT = generateJWT;
+        _configuration = configuration;
         _googleClientId = configuration["GoogleAuth:ClientId"] ?? string.Empty;
     }
 
@@ -40,7 +42,11 @@ public class AuthService : IAuthService
             };
 
             var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
-            
+
+            var allowedEmails = _configuration.GetSection("AllowedEmails").Get<string[]>() ?? [];
+            if (!allowedEmails.Contains(payload.Email, StringComparer.OrdinalIgnoreCase))
+                return null;
+
             var user = await _userService.GetByGoogleIdAsync(payload.Subject);
             
             if (user == null)
