@@ -1,4 +1,4 @@
-using Core.DTOs;
+using Core.DTOs.Common;
 using Core.Interfaces;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
