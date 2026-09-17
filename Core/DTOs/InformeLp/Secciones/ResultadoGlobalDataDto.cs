@@ -1,11 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Core.DTOs;
+namespace Core.DTOs.InformeLp.Secciones;
 
 public class ResultadoGlobalDataDto
 {
     [Required(ErrorMessage = "El campo Resultado Global es obligatorio.")]
-    [RegularExpression("^(aceptable|aceptableConIndicaciones|noAceptable)$", 
+    [RegularExpression("^(aceptable|aceptableConIndicaciones|noAceptable)$",
         ErrorMessage = "El resultado global debe ser 'aceptable', 'aceptableConIndicaciones' o 'noAceptable'")]
     public string ResultadoGlobal { get; set; } = string.Empty;
 

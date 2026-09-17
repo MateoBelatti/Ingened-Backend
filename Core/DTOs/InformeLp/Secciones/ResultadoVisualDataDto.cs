@@ -1,11 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Core.DTOs;
+namespace Core.DTOs.InformeLp.Secciones;
 
 public class ResultadoVisualDataDto
 {
     [Required(ErrorMessage = "El campo Resultado Visual es obligatorio.")]
-    [RegularExpression("^(aceptable|aceptableConIndicaciones|noAceptable)$", 
+    [RegularExpression("^(aceptable|aceptableConIndicaciones|noAceptable)$",
         ErrorMessage = "El resultado visual debe ser 'aceptable', 'aceptableConIndicaciones' o 'noAceptable'")]
     public string ResultadoVisual { get; set; } = string.Empty;
 
