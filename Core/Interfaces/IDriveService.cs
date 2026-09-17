@@ -1,4 +1,4 @@
-using Core.DTOs;
+using Core.DTOs.Common;
 
 namespace Core.Interfaces;
 
