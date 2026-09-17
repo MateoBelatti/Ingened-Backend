@@ -25,7 +25,7 @@ public class InformeLpDocumentBuilder : IDocument, IInformeDocumentBuilder
     public byte[] GeneratePdf(object datos)
     {
         _informe = (InformeLpDto)datos;
-        return Document.Create(this).GeneratePdf();
+        return Document.Create(Compose).GeneratePdf();
     }
 
     public void Compose(IDocumentContainer container)
