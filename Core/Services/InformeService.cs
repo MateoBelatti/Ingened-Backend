@@ -31,29 +31,28 @@ public class InformeService : IInformeService
         return await GenerarInternoAsync(dto, userId, "LP");
     }
 
-    private async Task<Informe> GenerarInternoAsync<TDto>(TDto dto, int userId, string tipo) where TDto : class
+    private async Task<Informe> GenerarInternoAsync<TDto>(TDto dto, int userId, string tipo) where TDto : class, IBaseInformeDto
     {
         if (dto == null)
             throw new ArgumentNullException(nameof(dto), "El informe no puede ser nulo.");
 
-        var lpDto = dto as InformeLpDto;
-        if (lpDto == null)
-            throw new ArgumentException("Tipo de DTO no válido para este método.", nameof(dto));
-
-        ValidarLpDto(lpDto);
+        if (dto is InformeLpDto lpDto)
+        {
+            ValidarLpDto(lpDto);
+        }
 
         var builder = _serviceProvider.GetKeyedService<IInformeDocumentBuilder>(tipo);
         if (builder == null)
             throw new NotSupportedException($"Tipo de informe '{tipo}' no registrado.");
 
-        var pdfBytes = builder.GeneratePdf(lpDto);
+        var pdfBytes = builder.GeneratePdf(dto);
 
-        var uploadResult = await _driveService.UploadPdfAsync(pdfBytes, lpDto.DatosArchivos);
-        _logger.LogInformation("PDF subido a Drive con FileId {FileId} para informe {Numero}", uploadResult.FileId, lpDto.DatosArchivos.NrInf);
+        var uploadResult = await _driveService.UploadPdfAsync(pdfBytes, dto.DatosArchivos);
+        _logger.LogInformation("PDF subido a Drive con FileId {FileId} para informe {Numero}", uploadResult.FileId, dto.DatosArchivos.NrInf);
 
         return await _informeRepository.CreateInformeAsync(
-            lpDto.DatosArchivos.NrInf,
-            lpDto.DatosArchivos.Cliente,
+            dto.DatosArchivos.NrInf,
+            dto.DatosArchivos.Cliente,
             uploadResult.WebViewLink,
             uploadResult.FileId,
             userId,

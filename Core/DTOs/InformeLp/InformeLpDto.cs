@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Core.DTOs.Common;
 using Core.DTOs.InformeLp.Secciones;
+using Core.Interfaces;
 
 namespace Core.DTOs.InformeLp;
 
-public class InformeLpDto
+public class InformeLpDto : IBaseInformeDto
 {
     [Required(ErrorMessage = "El tipo de informe es obligatorio.")]
     public string Tipo { get; set; } = "LP";
