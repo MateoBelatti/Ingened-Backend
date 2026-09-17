@@ -1,9 +1,9 @@
-using Core.DTOs;
+using Core.DTOs.InformeLp;
 using Core.Entities;
 using Core.Interfaces;
 using Core.utils.InformeLp;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using QuestPDF.Fluent;
 
 namespace Core.Services;
 
@@ -12,41 +12,62 @@ public class InformeService : IInformeService
     private readonly IDriveService _driveService;
     private readonly IInformeRepository _informeRepository;
     private readonly ILogger<InformeService> _logger;
+    private readonly IServiceProvider _serviceProvider;
 
-    public InformeService(IDriveService driveService, IInformeRepository informeRepository, ILogger<InformeService> logger)
+    public InformeService(
+        IDriveService driveService,
+        IInformeRepository informeRepository,
+        ILogger<InformeService> logger,
+        IServiceProvider serviceProvider)
     {
         _logger = logger;
         _driveService = driveService;
         _informeRepository = informeRepository;
+        _serviceProvider = serviceProvider;
     }
 
-    public async Task<Informe> GenerarYGuardarInformeAsync(InformeDTO informeDto, int userId)
+    public async Task<Informe> GenerarLpAsync(InformeLpDto dto, int userId)
     {
-        if (informeDto == null)
-            throw new ArgumentNullException(nameof(informeDto), "El informe no puede ser nulo.");
+        return await GenerarInternoAsync(dto, userId, "LP");
+    }
 
-        if (informeDto.Elementos == null || informeDto.Elementos.Count == 0)
-            throw new ArgumentException("Debe haber al menos un elemento inspeccionado.", nameof(informeDto));
+    private async Task<Informe> GenerarInternoAsync<TDto>(TDto dto, int userId, string tipo) where TDto : class
+    {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto), "El informe no puede ser nulo.");
 
-        if (informeDto.Consumibles == null || informeDto.Consumibles.Count == 0)
-            throw new ArgumentException("Debe registrar al menos un consumible.", nameof(informeDto));
-        
-        // Genera el informe
-        var document = new InformeLpDocument(informeDto);
-        var pdfBytes = document.GeneratePdf();
+        var lpDto = dto as InformeLpDto;
+        if (lpDto == null)
+            throw new ArgumentException("Tipo de DTO no válido para este método.", nameof(dto));
 
-        // Sube el informe a drive
-        var uploadResult = await _driveService.UploadPdfAsync(pdfBytes, informeDto.DatosArchivos);
-        _logger.LogInformation("PDF subido a Drive con FileId {FileId} para informe {Numero}", uploadResult.FileId, informeDto.DatosArchivos.NrInf);
+        ValidarLpDto(lpDto);
 
-        // 3. Guardar en Base de Datos a través del repositorio
+        var builder = _serviceProvider.GetKeyedService<IInformeDocumentBuilder>(tipo);
+        if (builder == null)
+            throw new NotSupportedException($"Tipo de informe '{tipo}' no registrado.");
+
+        var pdfBytes = builder.GeneratePdf(lpDto);
+
+        var uploadResult = await _driveService.UploadPdfAsync(pdfBytes, lpDto.DatosArchivos);
+        _logger.LogInformation("PDF subido a Drive con FileId {FileId} para informe {Numero}", uploadResult.FileId, lpDto.DatosArchivos.NrInf);
+
         return await _informeRepository.CreateInformeAsync(
-            informeDto.DatosArchivos.NrInf,
-            informeDto.DatosArchivos.Cliente,
+            lpDto.DatosArchivos.NrInf,
+            lpDto.DatosArchivos.Cliente,
             uploadResult.WebViewLink,
             uploadResult.FileId,
-            userId
+            userId,
+            tipo
         );
+    }
+
+    private void ValidarLpDto(InformeLpDto dto)
+    {
+        if (dto.Elementos == null || dto.Elementos.Count == 0)
+            throw new ArgumentException("Debe haber al menos un elemento inspeccionado.", nameof(dto.Elementos));
+
+        if (dto.Consumibles == null || dto.Consumibles.Count == 0)
+            throw new ArgumentException("Debe registrar al menos un consumible.", nameof(dto.Consumibles));
     }
 
     public async Task<IEnumerable<Informe>> GetAllInformesAsync()
