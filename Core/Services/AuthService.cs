@@ -44,8 +44,14 @@ public class AuthService : IAuthService
 
             var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
 
-            var allowedEmails = _configuration.GetSection("AllowedEmails").Get<string[]>() ?? [];
-            if (!allowedEmails.Contains(payload.Email, StringComparer.OrdinalIgnoreCase))
+            var allowedEmailsArray = _configuration.GetSection("AllowedEmails").Get<string[]>();
+            var allowedEmailsRaw = _configuration["AllowedEmails"];
+
+            var allowedEmails = allowedEmailsArray?.Length > 0
+                ? allowedEmailsArray
+                : (allowedEmailsRaw?.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? []);
+
+            if (allowedEmails.Length > 0 && !allowedEmails.Contains(payload.Email, StringComparer.OrdinalIgnoreCase))
                 throw new UnauthorizedException($"El email '{payload.Email}' no está autorizado para acceder. Contacte al administrador.");
 
             var user = await _userService.GetByGoogleIdAsync(payload.Subject);
