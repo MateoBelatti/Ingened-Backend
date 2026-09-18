@@ -36,7 +36,6 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    [AllowAnonymous] // Permitimos crear un usuario sin token para que puedas probar el primer registro desde Postman
     public async Task<IActionResult> Create([FromBody] UserCreateDTO createDto)
     {
         if (!ModelState.IsValid)

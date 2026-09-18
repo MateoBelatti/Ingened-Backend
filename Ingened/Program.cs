@@ -2,6 +2,7 @@ using Core.Data;
 using Core.Interfaces;
 using Core.Repositories;
 using Core.Services;
+using Core.utils.InformeLp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -31,6 +32,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IInformeService, InformeService>();
 builder.Services.AddScoped<IInformeRepository, InformeRepository>();
 builder.Services.AddScoped<IDriveService, DriveService>();
+
+builder.Services.AddKeyedScoped<IInformeDocumentBuilder, InformeLpDocumentBuilder>("LP");
 
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<Core.Mapper.UserMapper>());
 

@@ -1,9 +1,15 @@
-    using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using Core.DTOs.Common;
+using Core.DTOs.InformeLp.Secciones;
+using Core.Interfaces;
 
-namespace Core.DTOs;
+namespace Core.DTOs.InformeLp;
 
-public class InformeDTO
+public class InformeLpDto : IBaseInformeDto
 {
+    [Required(ErrorMessage = "El tipo de informe es obligatorio.")]
+    public string Tipo { get; set; } = "LP";
+
     [Required(ErrorMessage = "Los datos del archivo son obligatorios.")]
     public DatosArchivosDto DatosArchivos { get; set; } = null!;
 
@@ -31,6 +37,5 @@ public class InformeDTO
     [Required(ErrorMessage = "Debe registrar al menos un consumible.")]
     public List<ConsumibleDto> Consumibles { get; set; } = new();
 
-    // Las fotos pueden ser opcionales o mandatorias dependiendo de la lógica de negocio
     public RegistroFotograficoDataDto? RegistroFotografico { get; set; }
 }

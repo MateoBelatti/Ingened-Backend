@@ -26,6 +26,10 @@ public class Informe
     public string GoogleDriveFileId { get; set; } = string.Empty;
 
     [Required]
+    [MaxLength(20)]
+    public string Tipo { get; set; } = "LP";
+
+    [Required]
     public int UserId { get; set; }
 
     // Relación con el usuario que creó/es dueño del informe

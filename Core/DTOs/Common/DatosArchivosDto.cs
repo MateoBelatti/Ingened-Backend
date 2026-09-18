@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Core.DTOs;
+namespace Core.DTOs.Common;
 
 public class DatosArchivosDto
 {
