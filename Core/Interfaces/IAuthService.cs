@@ -1,7 +1,10 @@
+using Core.DTOs;
+
 namespace Core.Interfaces;
 
 public interface IAuthService
 {
-    Task<string?> LoginAsync(string email, string password);
-    Task<string?> GoogleLoginAsync(string idToken);
+    Task<AuthResponseDTO?> LoginAsync(string email, string password);
+    Task<AuthResponseDTO?> GoogleLoginAsync(string idToken);
+    Task<AuthResponseDTO?> RefreshTokenAsync(string refreshToken);
 }

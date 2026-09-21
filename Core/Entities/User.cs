@@ -27,4 +27,10 @@ public class User
 
     [MaxLength(255)]
     public string? GoogleId { get; set; }
+
+    [MaxLength(500)]
+    public string? RefreshToken { get; set; }
+
+    [Column(TypeName = "timestamp with time zone")]
+    public DateTime? RefreshTokenExpiryTime { get; set; }
 }

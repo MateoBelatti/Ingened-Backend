@@ -21,12 +21,12 @@ public class AuthController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var token = await _authService.LoginAsync(loginDto.Email, loginDto.Password);
+        var result = await _authService.LoginAsync(loginDto.Email, loginDto.Password);
 
-        if (token == null)
+        if (result == null)
             return Unauthorized(new { message = "Credenciales incorrectas" });
 
-        return Ok(new { Token = token });
+        return Ok(result);
     }
 
     [HttpPost("google")]
@@ -35,11 +35,25 @@ public class AuthController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var token = await _authService.GoogleLoginAsync(googleLoginDto.IdToken);
+        var result = await _authService.GoogleLoginAsync(googleLoginDto.IdToken);
 
-        if (token == null)
+        if (result == null)
             return Unauthorized(new { message = "Token de Google inválido" });
 
-        return Ok(new { Token = token });
+        return Ok(result);
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequestDTO refreshDto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _authService.RefreshTokenAsync(refreshDto.RefreshToken);
+
+        if (result == null)
+            return Unauthorized(new { message = "Token de refresco inválido o expirado" });
+
+        return Ok(result);
     }
 }
